@@ -39,12 +39,11 @@ function StatusBadge({ status }) {
 export default function TrackingPage() {
   const { remision } = useParams();
 
-  // Cargamos Google Maps una sola vez (para mapa + geocoder)
   const { isLoaded: mapsLoaded, loadError: mapsError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   });
 
-  const [payload, setPayload] = useState(null); // { msg, data? }
+  const [payload, setPayload] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -87,7 +86,6 @@ export default function TrackingPage() {
     }
   };
 
-  // Fetch inicial
   useEffect(() => {
     if (!remision) return;
     setLoading(true);
@@ -95,7 +93,6 @@ export default function TrackingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remision]);
 
-  // Polling 15s solo si está en tránsito
   useEffect(() => {
     if (!remision) return;
     if (docStatus !== "T") return;
@@ -105,7 +102,6 @@ export default function TrackingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remision, docStatus]);
 
-  // Reverse geocoding (dirección en palabras)
   useEffect(() => {
     if (!mapsLoaded || !lastLatLng) return;
     if (!window.google?.maps?.Geocoder) return;
@@ -143,7 +139,6 @@ export default function TrackingPage() {
     );
   }
 
-  // No existe
   if (!data) {
     return (
       <div className="min-h-screen bg-[#050b18] p-6 text-white">
@@ -174,84 +169,88 @@ export default function TrackingPage() {
   return (
     <div className="min-h-screen bg-[#050b18] text-white">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="text-sm text-white/60">Tracking</div>
-            <h1 className="mt-1 text-2xl font-semibold">
-              Remisión <span className="text-[#6aa1ff]">{data.DocNum}</span>
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <StatusBadge status={docStatus} />
-              <span className="text-xs text-white/55">
-                Planta: {data.Planta}
-              </span>
-              <span className="text-xs text-white/55">
-                Empresa: {data.Empresa}
-              </span>
-            </div>
-          </div>
+        {/* HEADER FULL WIDTH */}
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-sm text-white/60">Tracking</div>
 
-          {docStatus === "T" && (
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/75">
-              Actualizando cada <span className="text-white">15s</span>
-            </div>
-          )}
-        </div>
+              <h1 className="mt-1 text-2xl font-semibold">
+                Remisión <span className="text-[#6aa1ff]">{data.DocNum}</span>
+              </h1>
 
-        {/* Datos + Productos */}
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 lg:col-span-2">
-            <div className="text-sm font-semibold">Datos</div>
-            <div className="mt-2 text-white/80">{data.CardName}</div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/55">Conductor</div>
-                <div className="mt-1 text-sm font-semibold text-white">
-                  {data.U_CSS_NOMCONDUCTOR || "—"}
-                </div>
-                <div className="mt-1 text-xs text-white/55">
-                  CC: {data.U_TT_CcConductor || "—"}
-                </div>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs text-white/55">Documento</div>
-                <div className="mt-1 text-sm font-semibold text-white">
-                  DocEntry: {data.DocEntry}
-                </div>
-                <div className="mt-1 text-xs text-white/55">
-                  Fecha:{" "}
-                  {data.DocDate
-                    ? new Date(data.DocDate).toLocaleDateString()
-                    : "—"}
-                </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <StatusBadge status={docStatus} />
+                <span className="text-xs text-white/55">
+                  Planta: {data.Planta}
+                </span>
+                <span className="text-xs text-white/55">
+                  Empresa: {data.Empresa}
+                </span>
               </div>
             </div>
-          </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <div className="text-sm font-semibold">Productos</div>
-            <div className="mt-3 space-y-3">
-              {(data.productos || []).slice(0, 6).map((p, idx) => (
-                <div
-                  key={`${p.ItemCode}-${idx}`}
-                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                >
-                  <div className="text-sm font-semibold">{p.Dscription}</div>
-                  <div className="mt-1 text-xs text-white/55">
-                    {p.ItemCode} • Cant: {p.Quantity}
-                  </div>
-                </div>
-              ))}
-              {(data.productos || []).length === 0 && (
-                <div className="text-sm text-white/70">—</div>
-              )}
-            </div>
+            {docStatus === "T" && (
+              <div className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/75">
+                Actualizando cada <span className="text-white">15s</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Ubicación actual + velocidad */}
+        {/* INFO REMISIÓN (DEBAJO DEL HEADER) */}
+        <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+          <div className="text-sm font-semibold">
+            Información de la remisión
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs text-white/55">Cliente</div>
+              <div className="mt-1 text-sm font-semibold text-white">
+                {data.CardName}
+              </div>
+              <div className="mt-1 text-xs text-white/55">{data.CardCode}</div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs text-white/55">Conductor</div>
+              <div className="mt-1 text-sm font-semibold text-white">
+                {data.U_CSS_NOMCONDUCTOR || "—"}
+              </div>
+              <div className="mt-1 text-xs text-white/55">
+                CC: {data.U_TT_CcConductor || "—"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs text-white/55">DocEntry</div>
+              <div className="mt-1 text-sm font-semibold text-white">
+                {data.DocEntry}
+              </div>
+              <div className="mt-1 text-xs text-white/55">
+                DocStatus: {docStatus}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs text-white/55">Fecha documento</div>
+              <div className="mt-1 text-sm font-semibold text-white">
+                {data.DocDate
+                  ? new Date(data.DocDate).toLocaleDateString()
+                  : "—"}
+              </div>
+              <div className="mt-1 text-xs text-white/55">
+                GPS:{" "}
+                {data.gpsDate
+                  ? new Date(data.gpsDate).toLocaleDateString()
+                  : "—"}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* UBICACIÓN + VELOCIDAD (DEBAJO DE INFO) */}
         {(docStatus === "T" || docStatus === "C") && (
           <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -281,35 +280,55 @@ export default function TrackingPage() {
           </div>
         )}
 
-        {/* Mapa / Estado */}
-        <div className="mt-6">
-          {docStatus === "O" ? (
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              <div className="text-lg font-semibold">Despacho pendiente</div>
-              <div className="mt-2 text-white/70">
-                Esta remisión está en estado{" "}
-                <span className="font-semibold text-amber-200">Abierta</span>. Aún
-                no inicia recorrido.
-              </div>
+        {/* MAPA (DEBAJO) */}
+        <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-sm font-semibold">Recorrido</div>
+            <div className="text-xs text-white/55">
+              Puntos: {coords?.length || 0}{" "}
+              {docStatus === "C" ? "• (Cerrado)" : ""}
             </div>
+          </div>
+
+          {docStatus === "O" ? (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-white/75">
+              Esta remisión está en estado{" "}
+              <span className="font-semibold text-amber-200">Abierta (O)</span>.
+              Aún no inicia recorrido, por eso no se muestra el mapa.
+            </div>
+          ) : mapsLoaded ? (
+            <TrackingMap coords={coords} />
           ) : (
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-sm font-semibold">Recorrido</div>
-                <div className="text-xs text-white/55">
-                  Puntos: {coords?.length || 0}{" "}
-                  {docStatus === "C" ? "• (Cerrado)" : ""}
+            <div className="text-white/70">Cargando mapa…</div>
+          )}
+        </div>
+
+        {/* PRODUCTOS (DEBAJO DEL MAPA) */}
+        <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-semibold">Productos</div>
+            <div className="text-xs text-white/55">
+              Total: {(data.productos || []).length}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {(data.productos || []).map((p, idx) => (
+              <div
+                key={`${p.ItemCode}-${idx}`}
+                className="rounded-2xl border border-white/10 bg-black/20 p-4"
+              >
+                <div className="text-sm font-semibold">{p.Dscription}</div>
+                <div className="mt-1 text-xs text-white/55">
+                  {p.ItemCode} • Cant: {p.Quantity}
                 </div>
               </div>
+            ))}
 
-              {/* Mapa */}
-              {mapsLoaded ? (
-                <TrackingMap coords={coords} />
-              ) : (
-                <div className="text-white/70">Cargando mapa…</div>
-              )}
-            </div>
-          )}
+            {(data.productos || []).length === 0 && (
+              <div className="text-sm text-white/70">—</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
