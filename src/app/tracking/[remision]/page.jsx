@@ -198,6 +198,29 @@ export default function TrackingPage() {
           </div>
         </div>
 
+        {/* MAPA (DEBAJO) */}
+        <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-sm font-semibold">Recorrido</div>
+            <div className="text-xs text-white/55">
+              Puntos: {coords?.length || 0}{" "}
+              {docStatus === "C" ? "• (Cerrado)" : ""}
+            </div>
+          </div>
+
+          {docStatus === "O" ? (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-white/75">
+              Esta remisión está en estado{" "}
+              <span className="font-semibold text-amber-200">Abierta (O)</span>.
+              Aún no inicia recorrido, por eso no se muestra el mapa.
+            </div>
+          ) : mapsLoaded ? (
+            <TrackingMap coords={coords} />
+          ) : (
+            <div className="text-white/70">Cargando mapa…</div>
+          )}
+        </div>
+
         {/* INFO REMISIÓN (DEBAJO DEL HEADER) */}
         <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
           <div className="text-sm font-semibold">
@@ -279,29 +302,6 @@ export default function TrackingPage() {
             </div>
           </div>
         )}
-
-        {/* MAPA (DEBAJO) */}
-        <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-sm font-semibold">Recorrido</div>
-            <div className="text-xs text-white/55">
-              Puntos: {coords?.length || 0}{" "}
-              {docStatus === "C" ? "• (Cerrado)" : ""}
-            </div>
-          </div>
-
-          {docStatus === "O" ? (
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-white/75">
-              Esta remisión está en estado{" "}
-              <span className="font-semibold text-amber-200">Abierta (O)</span>.
-              Aún no inicia recorrido, por eso no se muestra el mapa.
-            </div>
-          ) : mapsLoaded ? (
-            <TrackingMap coords={coords} />
-          ) : (
-            <div className="text-white/70">Cargando mapa…</div>
-          )}
-        </div>
 
         {/* PRODUCTOS (DEBAJO DEL MAPA) */}
         <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-6">
