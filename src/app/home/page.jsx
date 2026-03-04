@@ -34,7 +34,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#050b18] text-white">
       <Navbar />
-
       {/* Hero */}
       <main className="relative">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
